@@ -1,0 +1,59 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build_all_libraries:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      
+      - uses: actions/checkout@v3
+
+      - name: prepairing
+        run: sudo apt install cmake g++ clang-11
+      
+      - name: Building of forrmater_lib
+        run: |
+         cd formatter_lib
+         cmake . -DCMAKE_CXX_COMPILER=clang++
+         cmake --build .
+         cd ..
+        
+      - name: Building of forrmater_ex_lib
+        run: |
+          cd formatter_ex_lib
+          cmake . -DCMAKE_CXX_COMPILER=clang++
+          cmake --build .
+          cd ..
+          
+      - name: Building of hello_world_application
+        run: |
+          cd hello_world_application
+          cmake . -DCMAKE_CXX_COMPILER=clang++
+          cmake --build .
+          cd ..
+          
+      - name: Building of solver_lib
+        run: |
+          cd solver_lib
+          cmake . -DCMAKE_CXX_COMPILER=clang++
+          cmake --build .
+          cd ..
+          
+      - name: Building of solver_application
+        run: |
+          cd solver_application
+          cmake . -DCMAKE_CXX_COMPILER=clang++
+          cmake --build .
+          cd ..    
