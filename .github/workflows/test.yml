@@ -1,0 +1,48 @@
+name: CI
+on:
+  push:
+    branches: [ main ]
+jobs:
+  build_all_libraries:
+    runs-on: ubuntu-latest
+    steps:
+      
+      - uses: actions/checkout@v3
+
+      - name: prepairing
+        run: sudo apt install cmake g++ clang-11
+      
+      - name: Building of forrmater_lib
+        run: |
+         cd formatter_lib
+         cmake . -DCMAKE_CXX_COMPILER=clang++
+         cmake --build .
+         cd ..
+        
+      - name: Building of forrmater_ex_lib
+        run: |
+          cd formatter_ex_lib
+          cmake . -DCMAKE_CXX_COMPILER=clang++
+          cmake --build .
+          cd ..
+          
+      - name: Building of hello_world_application
+        run: |
+          cd hello_world_application
+          cmake . -DCMAKE_CXX_COMPILER=clang++
+          cmake --build .
+          cd ..
+          
+      - name: Building of solver_lib
+        run: |
+          cd solver_lib
+          cmake . -DCMAKE_CXX_COMPILER=clang++
+          cmake --build .
+          cd ..
+          
+      - name: Building of solver_application
+        run: |
+          cd solver_application
+          cmake . -DCMAKE_CXX_COMPILER=clang++
+          cmake --build .
+          cd ..    
