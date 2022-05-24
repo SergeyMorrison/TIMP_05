@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.18)
 
 set(CMAKE_CXX_STANDARD 20)
 
-option(BUILD_TEST "Build test" OFF)
+option(BUILD_TESTS "Build tests" OFF)
 option(COVERALLS "Check coverage" OFF)
 
 project(bank)
@@ -19,12 +19,12 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-if (BUILD_TEST)
+if (BUILD_TESTS)
     include(GoogleTest)
     enable_testing()
     add_executable(bank_test ${CMAKE_CURRENT_SOURCE_DIR}/tests/test.cpp)
     target_link_libraries(bank_test account transaction gtest_main gmock_main)
-    gtest_discover_test(bank_test)
+    gtest_discover_tests(bank_test)
 endif ()
 
 if (COVERALLS)
