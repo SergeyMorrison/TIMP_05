@@ -1,7 +1,0 @@
-cmake_minimum_required(VERSION 3.10)
-project(solver_lib)
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CURRENT_SOURCE_DIR /home/runner/work/TIMP04_04/TIMP04_04/)
-add_library(solver_lib STATIC ${CMAKE_CURRENT_SOURCE_DIR}/solver_lib/solver.cpp)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
