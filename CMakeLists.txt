@@ -1,36 +1,34 @@
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 3.18)
 
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 20)
 
-option(BUILD_EXAMPLES "Build examples" OFF)
+option(BUILD_TESTS "Build tests" OFF)
+option(COVERALLS "Check coverage" OFF)
 
-project(print)
+project(bank)
 
-add_library(print STATIC ${CMAKE_CURRENT_SOURCE_DIR}/sources/print.cpp)
+add_library(account STATIC banking/Account.cpp banking/Account.h)
+add_library(transaction STATIC banking/Transaction.cpp banking/Transaction.h)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/banking)
 
-target_include_directories(print PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
+include(FetchContent)
+FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
 )
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
 
-if(BUILD_EXAMPLES)
-  file(GLOB EXAMPLE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/examples/*.cpp")
-  foreach(EXAMPLE_SOURCE ${EXAMPLE_SOURCES})
-    get_filename_component(EXAMPLE_NAME ${EXAMPLE_SOURCE} NAME_WE)
-    add_executable(${EXAMPLE_NAME} ${EXAMPLE_SOURCE})
-    target_link_libraries(${EXAMPLE_NAME} print)
-    install(TARGETS ${EXAMPLE_NAME}
-      RUNTIME DESTINATION bin
-    )
-  endforeach(EXAMPLE_SOURCE ${EXAMPLE_SOURCES})
-endif()
+if (BUILD_TESTS)
+    include(GoogleTest)
+    enable_testing()
+    add_executable(bank_test ${CMAKE_CURRENT_SOURCE_DIR}/tests/test.cpp)
+    target_link_libraries(bank_test account transaction gtest_main gmock_main)
+    gtest_discover_tests(bank_test)
+endif ()
 
-install(TARGETS print
-    EXPORT print-config
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-)
-
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION include)
-install(EXPORT print-config DESTINATION cmake)
+if (COVERALLS)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-arcs -ftest-coverage")
+    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
+endif ()
