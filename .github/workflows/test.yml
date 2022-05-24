@@ -1,48 +1,32 @@
-name: CI
-on:
-  push:
-    branches: [ main ]
+name: test
+on: [ push ]
 jobs:
-  build_all_libraries:
+  BuildTest:
     runs-on: ubuntu-latest
-    steps:
-      
-      - uses: actions/checkout@v3
+    timeout-minutes: 3
 
-      - name: prepairing
-        run: sudo apt install cmake g++ clang-11
-      
-      - name: Building of forrmater_lib
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: prepare
         run: |
-         cd formatter_lib
-         cmake . -DCMAKE_CXX_COMPILER=clang++
-         cmake --build .
-         cd ..
-        
-      - name: Building of forrmater_ex_lib
+          sudo apt-get install lcov
+      - name: building
         run: |
-          cd formatter_ex_lib
-          cmake . -DCMAKE_CXX_COMPILER=clang++
-          cmake --build .
-          cd ..
-          
-      - name: Building of hello_world_application
+          mkdir build && cd build
+          cmake -DBUILD_TESTS=ON -DCOVERALLS=ON ..
+          make
+      - name: test
         run: |
-          cd hello_world_application
-          cmake . -DCMAKE_CXX_COMPILER=clang++
-          cmake --build .
-          cd ..
-          
-      - name: Building of solver_lib
+          cd build
+          ctest
+      - name: coverage
         run: |
-          cd solver_lib
-          cmake . -DCMAKE_CXX_COMPILER=clang++
-          cmake --build .
-          cd ..
-          
-      - name: Building of solver_application
-        run: |
-          cd solver_application
-          cmake . -DCMAKE_CXX_COMPILER=clang++
-          cmake --build .
-          cd ..    
+          mkdir coverage
+          lcov -d . -t bank_test -o coverage/lcov.info  -b . -c --no-external
+          lcov --remove coverage/lcov.info '*/gmock/*' '*/gtest/*' '*/include/*' -o coverage/lcov.info
+      - name: Publish to coveralls.io
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ github.token }}
